@@ -4,15 +4,18 @@ FROM node:20-alpine
 # Definir directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de configuración
-COPY package*.json ./
+# Copiar package.json primero
+COPY package.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Instalar todas las dependencias (incluye dev para TypeScript)
+RUN npm ci
 
 # Copiar código fuente
-COPY dist/ ./dist/
-COPY .env.example ./
+COPY src/ ./src/
+COPY tsconfig.json ./
+
+# Compilar TypeScript
+RUN npm run build
 
 # Exponer puerto
 EXPOSE 3000
