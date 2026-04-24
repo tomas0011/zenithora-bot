@@ -2,10 +2,8 @@
 node_modules
 npm-debug.log
 
-# TypeScript
-src
-*.ts
-tsconfig.json
+# TypeScript (se necesita en build)
+# NOT: src necesita estar incluido!
 
 # Git
 .git
@@ -25,3 +23,11 @@ logs
 # Test
 *.test.ts
 __tests__
+
+# Environment
+.env
+.env.docker
+.env.*.local
+
+# Build output (se genera en container)
+dist
