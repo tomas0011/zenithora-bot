@@ -4,8 +4,8 @@ FROM node:20-alpine
 # Definir directorio de trabajo
 WORKDIR /app
 
-# Copiar package.json primero
-COPY package.json ./
+# Copiar package.json y tsconfig.json (necesarios para build)
+COPY package.json package-lock.json tsconfig.json ./
 
 # Instalar todas las dependencias (incluye dev para TypeScript)
 RUN npm ci

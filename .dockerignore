@@ -1,4 +1,4 @@
-# Node.js
+# Node.js - NO ignorar package-lock.json (necesario para npm ci)
 node_modules
 npm-debug.log
 
@@ -31,3 +31,8 @@ __tests__
 
 # Build output (se genera en container)
 dist
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
