@@ -1,0 +1,27 @@
+# Node.js
+node_modules
+npm-debug.log
+
+# TypeScript
+src
+*.ts
+tsconfig.json
+
+# Git
+.git
+.gitignore
+
+# Docs
+README.md
+*.md
+
+# IDE
+.vscode
+.idea
+
+# Logs
+logs
+
+# Test
+*.test.ts
+__tests__
