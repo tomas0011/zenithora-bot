@@ -3,7 +3,7 @@
  * Lógica para crear y publicar encuestas en Discord
  */
 
-import type { PollOption, DiscordPoll, DiscordEmoji } from '../models/types.js';
+import type { PollOption, DiscordPoll, DiscordEmoji, DatePlaceholders } from '../models/types.js';
 import { DiscordService } from './discord.service.js';
 import { DateService } from './date.service.js';
 
@@ -34,15 +34,16 @@ export class PollService {
    */
   static buildAnswers(
     options: PollOption[],
-    saturday: Date | null,
-    sunday: Date | null
+    dates: DatePlaceholders
   ): { poll_media: { text: string; emoji?: DiscordEmoji } }[] {
+    const { friday, saturday, sunday } = dates;
+    
     return options.map((option) => {
       let label = option.label || '';
 
       // Reemplazar placeholders de fecha
-      if (saturday || sunday) {
-        label = DateService.replaceDatePlaceholders(label, saturday, sunday);
+      if (friday || saturday || sunday) {
+        label = DateService.replaceDatePlaceholders(label, friday, saturday, sunday);
       }
 
       const pollMedia: { text: string; emoji?: DiscordEmoji } = { text: label };
@@ -68,17 +69,18 @@ export class PollService {
       allow_multiple_answers?: boolean;
       allow_multiple?: boolean;
     },
-    saturday: Date | null,
-    sunday: Date | null
+    dates: DatePlaceholders
   ): DiscordPoll {
     const options = pollData.options || [];
     const questionText = pollData.question || '📊 Encuesta';
+    const { friday, saturday, sunday } = dates;
 
     // Reemplazar placeholders en la pregunta
     let finalQuestion = questionText;
-    if (saturday || sunday) {
+    if (friday || saturday || sunday) {
       finalQuestion = DateService.replaceDatePlaceholders(
         questionText,
+        friday,
         saturday,
         sunday
       );
@@ -86,7 +88,7 @@ export class PollService {
 
     return {
       question: { text: finalQuestion },
-      answers: this.buildAnswers(options, saturday, sunday),
+      answers: this.buildAnswers(options, dates),
       duration: pollData.duration || 24,
       allow_multiselect:
         pollData.allow_multiple_answers ||
@@ -111,10 +113,10 @@ export class PollService {
   ): Promise<unknown> {
     // Detectar y calcular fechas
     const options = pollData.options || [];
-    const { saturday, sunday } = DateService.detectDatePlaceholders(options);
+    const dates = DateService.detectDatePlaceholders(options);
 
     // Crear poll
-    const pollObj = this.createPollObject(pollData, saturday, sunday);
+    const pollObj = this.createPollObject(pollData, dates);
 
     // Publicar en Discord
     return DiscordService.publishPoll(channelId, pollObj);

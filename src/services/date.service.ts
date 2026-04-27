@@ -8,7 +8,7 @@ import type { DatePlaceholders } from '../models/types.js';
 export class DateService {
   /**
    * Obtiene la fecha del próximo día de la semana
-   * @param targetWeekday 0 = Lunes, 6 = Domingo
+   * @param targetWeekday 0 = Domingo, 1 = Lunes, ... 6 = Sábado
    */
   static getNextDateByWeekday(targetWeekday: number): Date {
     const today = new Date();
@@ -25,17 +25,34 @@ export class DateService {
   }
 
   /**
+   * Obtiene la fecha del próximo lunes
+   */
+  static getNextMonday(): Date {
+    return this.getNextDateByWeekday(1);
+  }
+
+  /**
+   * Obtiene la fecha del próximo viernes
+   */
+  static getNextFriday(): Date {
+    return this.getNextDateByWeekday(5);
+  }
+
+  /**
    * Obtiene la fecha del próximo sábado
    */
   static getNextSaturday(): Date {
-    return this.getNextDateByWeekday(5);
+    return this.getNextDateByWeekday(6);
   }
 
   /**
    * Obtiene la fecha del próximo domingo
    */
   static getNextSunday(): Date {
-    return this.getNextDateByWeekday(6);
+    const saturday = this.getNextSaturday();
+    const sunday = new Date(saturday);
+    sunday.setDate(saturday.getDate() + 1);
+    return sunday;
   }
 
   /**
@@ -57,14 +74,24 @@ export class DateService {
   }
 
   /**
-   * Reemplaza los placeholders {saturday} y {sunday} en un texto
+   * Reemplaza los placeholders {monday}, {friday}, {saturday} y {sunday} en un texto
    */
   static replaceDatePlaceholders(
     text: string,
+    monday: Date | null,
+    friday: Date | null,
     saturday: Date | null,
     sunday: Date | null
   ): string {
     let result = text;
+    
+    if (monday) {
+      result = result.replace(/{monday}/g, this.formatDate(monday, 'short'));
+    }
+    
+    if (friday) {
+      result = result.replace(/{friday}/g, this.formatDate(friday, 'short'));
+    }
     
     if (saturday) {
       result = result.replace(/{saturday}/g, this.formatDate(saturday, 'short'));
@@ -81,11 +108,19 @@ export class DateService {
    * Detecta si hay placeholders de fecha en los datos
    */
   static detectDatePlaceholders(options: { label?: string }[]): DatePlaceholders {
+    let hasMonday = false;
+    let hasFriday = false;
     let hasSaturday = false;
     let hasSunday = false;
 
     for (const option of options) {
       const label = option.label || '';
+      if (label.includes('{monday}')) {
+        hasMonday = true;
+      }
+      if (label.includes('{friday}')) {
+        hasFriday = true;
+      }
       if (label.includes('{saturday}')) {
         hasSaturday = true;
       }
@@ -95,6 +130,8 @@ export class DateService {
     }
 
     return {
+      monday: hasMonday ? this.getNextMonday() : null,
+      friday: hasFriday ? this.getNextFriday() : null,
       saturday: hasSaturday ? this.getNextSaturday() : null,
       sunday: hasSunday ? this.getNextSunday() : null
     };

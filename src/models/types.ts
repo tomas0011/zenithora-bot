@@ -126,6 +126,8 @@ export interface CommandParams {
 // ============================================
 
 export interface DatePlaceholders {
+  monday: Date | null;
+  friday: Date | null;
   saturday: Date | null;
   sunday: Date | null;
 }
