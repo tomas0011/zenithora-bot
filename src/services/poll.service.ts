@@ -36,14 +36,14 @@ export class PollService {
     options: PollOption[],
     dates: DatePlaceholders
   ): { poll_media: { text: string; emoji?: DiscordEmoji } }[] {
-    const { friday, saturday, sunday } = dates;
+    const { monday, friday, saturday, sunday } = dates;
     
     return options.map((option) => {
       let label = option.label || '';
 
       // Reemplazar placeholders de fecha
-      if (friday || saturday || sunday) {
-        label = DateService.replaceDatePlaceholders(label, friday, saturday, sunday);
+      if (monday || friday || saturday || sunday) {
+        label = DateService.replaceDatePlaceholders(label, monday, friday, saturday, sunday);
       }
 
       const pollMedia: { text: string; emoji?: DiscordEmoji } = { text: label };
@@ -73,13 +73,14 @@ export class PollService {
   ): DiscordPoll {
     const options = pollData.options || [];
     const questionText = pollData.question || '📊 Encuesta';
-    const { friday, saturday, sunday } = dates;
+    const { monday, friday, saturday, sunday } = dates;
 
     // Reemplazar placeholders en la pregunta
     let finalQuestion = questionText;
-    if (friday || saturday || sunday) {
+    if (monday || friday || saturday || sunday) {
       finalQuestion = DateService.replaceDatePlaceholders(
         questionText,
+        monday,
         friday,
         saturday,
         sunday
